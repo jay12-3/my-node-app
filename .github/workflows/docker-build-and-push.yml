@@ -3,10 +3,7 @@ name: Build and Push Docker Image
 on:
   push:
     branches:
-      - main  # Trigger on changes to the 'main' branch
-  pull_request:
-    branches:
-      - main
+      - main  # Adjust this branch name to match your default branch
 
 jobs:
   build:
@@ -27,6 +24,12 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-buildx-
 
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
     - name: Build and push Docker image
       uses: docker/build-push-action@v4
       with:
@@ -34,9 +37,6 @@ jobs:
         file: ./Dockerfile
         push: true
         tags: jay123jay/my-node-app:latest
-      env:
-        DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-        DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
     - name: Logout from Docker Hub
       run: docker logout
